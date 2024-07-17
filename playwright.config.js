@@ -1,6 +1,7 @@
 // @ts-check
 const { defineConfig, devices } = require("@playwright/test");
 const path = require("path");
+import * as os from "os";
 
 /**
  * Read environment variables from file.
@@ -22,7 +23,22 @@ module.exports = defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
+  reporter: [
+    ["html"],
+    [
+      "allure-playwright",
+      {
+        detail: true,
+        suiteTitle: false,
+        environmentInfo: {
+          os_platform: os.platform(),
+          os_release: os.release(),
+          os_version: os.version(),
+          node_version: process.version,
+        },
+      },
+    ],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     locale: "en-GB",
@@ -35,12 +51,12 @@ module.exports = defineConfig({
       args: ["--start-fullscreen"]
     },
     video: {
-      mode: "retain-on-failure",
+      mode: "on",
       size: { width: 640, height: 480 },
     },
-    trace: "retain-on-failure",
+    trace: "on",
     testIdAttribute: "autocomplete",
-    screenshot: "only-on-failure",
+    screenshot: "on",
   },
 
   /* Configure projects for major browsers */
